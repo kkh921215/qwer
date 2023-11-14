@@ -130,6 +130,7 @@ def realsense(model_config, conn):
                 df_obj.loc[min_idx, ['x3d', 'y3d', 'z3d']] = [x3d, y3d, z3d]
                 conn.send(MSG_DETECTED)
                 conn.send(np.array(df_obj.loc[min_idx, ['x3d', 'y3d', 'z3d']]))
+                conn.send(df_obj.loc[min_idx, 'dist'])
                 conn.send(nxt_dst)
             else:
                 conn.send(MSG_NOTHING)

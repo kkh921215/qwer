@@ -107,6 +107,7 @@ def indy_task(config, conn1, conn2):
 
                         if cam_data == MSG_DETECTED:
                             cam_data = conn2.recv()
+                            min_dist = conn2.recv()
                             next_dist = conn2.recv()
                             print('Main Robot received cam_data: ', cam_data)
                             print('Main Robot received next_dist: ', next_dist)
@@ -157,9 +158,33 @@ def indy_task(config, conn1, conn2):
                             time.sleep(0.5)
 
                             # Message to Send
-                            message_to_send = f'AGR/GO/{next_dist}'
-                            server_socket.send(message_to_send.encode())
-                            time.sleep(6)
+                            indy.joint_move_to(SNAPSHOT)
+                            indy.wait_for_move_finish()
+                            time.sleep(1)
+
+                            while True:
+                                criterion = 30 ## 거리 설정
+                                conn2.send(MSG_TRIGGER)
+                                cam_data = conn2.recv()
+                                print('Main Robot received cam data: ', cam_data)
+
+                                if cam_data == MSG_DETECTED:
+                                    cam_data = conn2.recv()
+                                    min_dist = conn2.recv()
+                                    next_dist = conn2.recv()
+                                    if min_dist < criterion:
+                                        import winsound
+
+                                        # 삐 소리를 내는 함수
+                                        def beep(frequency, duration):
+                                            winsound.Beep(frequency, duration)
+
+                                        # 삐 소리를 1000Hz 주파수로 1000ms 동안 내기
+                                        beep(1000, 1000)
+                                        break
+                            # message_to_send = f'AGR/GO/{next_dist}'
+                            # server_socket.send(message_to_send.encode())
+                            # time.sleep(6)
                             break
 
                         elif cam_data == MSG_NOTHING:

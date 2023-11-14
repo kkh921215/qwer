@@ -177,10 +177,11 @@ class yolov8:
       print(df_data['x1'][sorted_index[0]],df_data['x1'][sorted_index[1]])
       next_dist = int(abs((r1 - r2)/10))-5
       
-      os.makedirs(r_path, exist_ok=True)
-      fname = 'img_' + str(idx) + '.jpg'
-      out_filename = os.path.join(r_path, fname)
-      cv2.imwrite(out_filename, visout)
+      # os.makedirs(r_path, exist_ok=True)
+      # fname = 'img_' + str(idx) + '.jpg'
+      # out_filename = os.path.join(r_path, fname)
+      # cv2.imwrite(out_filename, visout)
+      cv2.imshow('result', visout)
       
     else:
       print('detected: nothing')
