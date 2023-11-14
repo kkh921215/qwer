@@ -1,0 +1,64 @@
+main_robot:
+  robot_ip: '192.168.0.115'
+  robot_name: 'NRMK-Indy7'
+  cali: [[1, 0, 0],
+        [0, -1, 0],
+        [0, 0, -1],
+        [-0.020, 0.150, 0.150]]
+  endtool: None
+  joint_vel: 5 #5
+  task_vel: 5 #5
+  offset: -0.47 #-0.47 # 0.000(100cm/10cm/1cm/1mm)
+  
+sub_robot:
+  robot_ip: '192.168.0.116'
+  robot_name: 'NRMK-Indy7'
+  cali: [[1, 0, 0], #[1, 0, 0]
+        [0, 1, 0], #[0, -1, 0]
+        [0, 0, -1],
+        [-0.235, -0.520, 0.480]] #[0.235, 0.550, 0]]
+  endtool:
+    init: ['ao', [0, 1000]]
+    open: ['do', [[0, 0], [1, 0]]]
+    close: ['do', [[0, 0], [1, 1]]]
+  joint_vel: 1
+  task_vel: 1 #5
+  offset: -0.15
+  
+plc:
+  plc_type: 'iQ-F'
+  plc_host: '192.168.0.199'
+  plc_port: [9988, 9989]
+  data_code: 'Binary' # or ascii
+  servo:
+    init: ['M6110', 'M5103']
+    line1: ['M6111', 'M5111']
+    line2: ['M6112', 'M5112']
+    line3: ['M6113', 'M5113']
+    line4: ['M6114', 'M5114']
+    line5: ['M6115', 'M5115']
+  command:
+    release: ['M200', [0, 1]] # M201
+    hold: ['M200', [1, 0]] # M200
+    up: ['M202', [0, 1]] # M203
+    down: ['M202', [1, 0]] # M202
+    open: ['M204', [0, 1]] # M205
+    close: ['M204', [1, 0]] # M204
+    grip: ['M206', [0, 1]] # M207
+    ungrip: ['M206', [1, 0]] # M206
+    
+  delay: 1
+
+vision:
+  camera: 'realsenseD435'
+  frame_width: 1280
+  frame_height: 720
+  model: 'yolo' #'detectron2' or 'yolo'
+  device: 'cpu' #'cpu' or 'gpu'
+  thresh: 0.7
+  class_name: ['Planted_spot','Planted_in']
+  offset: 0.3
+  crop:
+    vertical: 0
+    horizontal: 0
+  imgsz: (640, 640)
