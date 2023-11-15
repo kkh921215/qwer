@@ -155,7 +155,7 @@ class yolov8:
         center_x = (org_x1 + org_x2) / 2
         center_y = (org_y1 + org_y2) / 2
         xy_pos = np.array([center_x, center_y])
-        center = np.array([w/2, h/2])
+        center = np.array([width/2, height/2])
         c_dist = np.linalg.norm(xy_pos - center)
         df_data.loc[i] = [center_x, center_y, x1, y1, x2, y2, c_dist]
 
