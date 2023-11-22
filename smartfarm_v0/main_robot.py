@@ -100,6 +100,28 @@ def indy_task(config, conn1, conn2):
                     indy.wait_for_move_finish()
                     time.sleep(1)
 
+                    # Message to Send """AGR/GO/99(Go) AGR/GO/0(Stop) AGR/GO/(음수)(Back)"""
+                    message_to_send = 'AGR/GO/99'
+                    server_socket.send(message_to_send.encode())
+
+                    while True:
+                        criterion = 77 ## 거리 설정
+                        conn2.send(MSG_TRIGGER)
+                        cam_data = conn2.recv()
+                        print('Main Robot received cam data: ', cam_data)
+                        if cam_data == MSG_DETECTED:
+                            cam_data = conn2.recv()
+                            min_dist = conn2.recv()
+                            next_dist = conn2.recv()
+                            if min_dist < criterion:
+                                message_to_send = 'AGR/GO/0'
+                                server_socket.send(message_to_send.encode())
+                                if min_dist > criterion:
+                                    min_cal = min_dist - criterion + 15
+                                    message_to_send = f'AGR/GO/{min_cal}'
+                                    server_socket.send(message_to_send.encode())
+                                break
+
                     while True:
                         conn2.send(MSG_TRIGGER)
                         cam_data = conn2.recv()
@@ -156,36 +178,36 @@ def indy_task(config, conn1, conn2):
                                 indy.wait_for_move_finish() ## AGV 신호 적용 시 적용
                                 # break ## AGV 신호 적용 후 삭제
                             time.sleep(0.5)
+                            
+                            # # Message to Send """AGR/GO/99(Go) AGR/GO/0(Stop) AGR/GO/(음수)(Back)"""
+                            # message_to_send = 'AGR/GO/99'
+                            # server_socket.send(message_to_send.encode())
+                            # time.sleep(6)
 
-                            # Message to Send
-                            indy.joint_move_to(SNAPSHOT)
-                            indy.wait_for_move_finish()
-                            time.sleep(1)
-
-                            while True:
-                                criterion = 30 ## 거리 설정
-                                conn2.send(MSG_TRIGGER)
-                                cam_data = conn2.recv()
-                                print('Main Robot received cam data: ', cam_data)
-
-                                if cam_data == MSG_DETECTED:
-                                    cam_data = conn2.recv()
-                                    min_dist = conn2.recv()
-                                    next_dist = conn2.recv()
-                                    if min_dist < criterion:
-                                        import winsound
-
-                                        # 삐 소리를 내는 함수
-                                        def beep(frequency, duration):
-                                            winsound.Beep(frequency, duration)
-
-                                        # 삐 소리를 1000Hz 주파수로 1000ms 동안 내기
-                                        beep(1000, 1000)
-                                        break
+                            # indy.joint_move_to(SNAPSHOT)
+                            # indy.wait_for_move_finish()
+                            # time.sleep(1)
+                            # while True:
+                            #     criterion = 77 ## 거리 설정
+                            #     conn2.send(MSG_TRIGGER)
+                            #     cam_data = conn2.recv()
+                            #     print('Main Robot received cam data: ', cam_data)
+                            #     if cam_data == MSG_DETECTED:
+                            #         cam_data = conn2.recv()
+                            #         min_dist = conn2.recv()
+                            #         next_dist = conn2.recv()
+                            #         if min_dist < criterion:
+                            #             message_to_send = 'AGR/GO/0'
+                            #             server_socket.send(message_to_send.encode())
+                            #             if min_dist > criterion:
+                            #                 min_cal = min_dist - criterion + 15
+                            #                 message_to_send = f'AGR/GO/{min_cal}'
+                            #                 server_socket.send(message_to_send.encode())
+                            #             break
+                        
                             # message_to_send = f'AGR/GO/{next_dist}'
                             # server_socket.send(message_to_send.encode())
                             # time.sleep(6)
-                            break
 
                         elif cam_data == MSG_NOTHING:
                             pass
